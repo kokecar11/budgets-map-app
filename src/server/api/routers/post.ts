@@ -18,7 +18,6 @@ export const postRouter = createTRPCRouter({
   hello: protectedProcedure
     .input(z.object({ text: z.string() }))
     .query(({ ctx, input }) => {
-      console.log(ctx.session);
       return {
         greeting: `Hello ${input.text}`,
       };

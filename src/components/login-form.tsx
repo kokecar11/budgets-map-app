@@ -1,13 +1,16 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { z } from "zod";
-import { api } from "~/trpc/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { type z } from "zod";
+import { loginAction } from "~/actions/auth-actions";
+// import { api } from "~/trpc/react";
+import { signIn } from "~/server/auth";
+// import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "~/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import { useAuthStore } from "~/context/useAuthStore";
+// import { useAuthStore } from "~/context/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { loginFormSchema } from "~/lib/zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -26,61 +29,81 @@ import {
   FormMessage,
 } from "./ui/form";
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
 export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
   // const [open, setOpen] = useState(false);
-  const setTokens = useAuthStore((state) => state.setTokens);
-  const queryClient = useQueryClient();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  // const setTokens = useAuthStore((state) => state.setTokens);
+  // const queryClient = useQueryClient();
+  const form = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const { mutate } = api.auth.signIn.useMutation({
-    onSuccess: async (data) => {
-      setTokens({
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-      });
-      await queryClient.invalidateQueries();
-    },
-  });
+  // const { mutate } = api.auth.signIn.useMutation({
+  //   onSuccess: async (data) => {
+  //     setTokens({
+  //       accessToken: data.accessToken,
+  //       refreshToken: data.refreshToken,
+  //     });
+  //     await queryClient.invalidateQueries();
+  //   },
+  // });
 
-  function onSubmit({ email, password }: z.infer<typeof formSchema>) {
-    mutate(
-      { email, password },
-      {
-        onSuccess: () => {
-          toast({
-            title: "Sign in successful",
-            description: "Welcome back!",
-            variant: "default",
-          });
-          router.push("/dashboard");
-        },
-        onError: (error) => {
-          toast({
-            title: "Error signing in",
-            description: error.message,
-            variant: "destructive",
-          });
-        },
-      },
-    );
+  async function onSubmit({
+    email,
+    password,
+  }: z.infer<typeof loginFormSchema>) {
+    const response = await loginAction({ email, password });
+    if (response) {
+      toast({
+        title: "Sign in successful",
+        description: "Welcome back!",
+        variant: "default",
+      });
+      router.push("/dashboard");
+    } else {
+      toast({
+        title: "Error signing in",
+        description: "Invalid credentials",
+        variant: "destructive",
+      });
+    }
+    // mutate(
+    //   { email, password },
+    //   {
+    //     onSuccess: () => {
+    //       toast({
+    //         title: "Sign in successful",
+    //         description: "Welcome back!",
+    //         variant: "default",
+    //       });
+    //       router.push("/dashboard");
+    //     },
+    //     onError: (error) => {
+    //       toast({
+    //         title: "Error signing in",
+    //         description: error.message,
+    //         variant: "destructive",
+    //       });
+    //     },
+    //   },
+    // );
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        // action={async (formData) => {
+        //   "use server";
+        //   await signIn("credentials", formData);
+        // }}
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8"
+      >
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
@@ -120,7 +143,7 @@ export function LoginForm() {
                       <div className="flex items-center">
                         <FormLabel>Password</FormLabel>
                         <Link
-                          href="#"
+                          href="/reset-password"
                           className="ml-auto inline-block text-sm underline"
                         >
                           Forgot your password?

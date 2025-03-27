@@ -1,3 +1,4 @@
+"use client";
 import "~/styles/globals.css";
 import { type Metadata } from "next";
 import {
@@ -15,16 +16,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
+import { usePathname } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Budgets Map",
-  description: "Budgets Map is a personal finance app.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
-};
+// export const metadata: Metadata = {
+//   title: "Budgets Map",
+//   description: "Budgets Map is a personal finance app.",
+//   icons: [{ rel: "icon", url: "/favicon.ico" }],
+// };
 
 export default function InternLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const pathname = usePathname();
+  const currentPathName = pathname.split("/")[1];
+
   return (
     <>
       <SidebarProvider>
@@ -37,13 +42,16 @@ export default function InternLayout({
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      Building Your Application
+                    <BreadcrumbLink href="/dashboard">
+                      <span className="sr-only">Home</span>
+                      Home
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                    <BreadcrumbPage className="capitalize">
+                      {currentPathName}
+                    </BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>

@@ -1,7 +1,6 @@
 "use client";
+import { Edit2, Lock, MoreVertical, Trash2, Unlock } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { formatCurrency } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
@@ -10,23 +9,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Edit2, Lock, MoreVertical, Trash2, Unlock } from "lucide-react";
+import { formatCurrency } from "~/lib/utils";
+
 interface BudgetCardProps {
   name: string;
   amount: number;
   description: string;
-  id: string;
   // onDelete: () => void;
 }
 
-export default function BudgetCard({
+export default function TransactionCard({
   name,
   amount,
   description,
-  id,
   // onDelete,
 }: BudgetCardProps) {
-  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [budget, setBudget] = useState<number | undefined>(undefined);
@@ -57,12 +54,7 @@ export default function BudgetCard({
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle
-          className="cursor-pointer text-sm font-medium hover:underline"
-          onClick={() => router.push("/budgets/" + id)}
-        >
-          {name}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium">{name}</CardTitle>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { env } from "~/env";
 
 export interface BudgetDetail {
     budget: Budget
@@ -8,21 +9,35 @@ export interface BudgetDetail {
 export interface BudgetsDetail {
     budgets: Budget[]
 }
-  
-export interface Budget {
-    name: string
-    total_amount: number
+
+export interface Transaction {
+    id: string
+    amount: number
     description: string
+    transaction_date: string
+    category: string
+    budget_id: string
+    
+}
+
+export interface Budget {
+    id: string
+    name: string
+    description: string
+    type: string
+    total_income: number
+    total_spent: number
+    total_remaining: number
+    percent_spent: number
     updated_at: string
     created_at: string
-    id: string
 }
 export const budgetRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ name: z.string(), total_amount: z.number(), description: z.string() }))
     .mutation(async ({ input, ctx }) => {
       
-      const urlApiBase = new URL('http://127.0.0.1:8000/api/v1');
+      const urlApiBase = new URL(env.API_BASE_URL);
       
       try {
         const requestCreateBudget = await fetch(`${urlApiBase.toString()}/budget`, {
@@ -50,13 +65,37 @@ export const budgetRouter = createTRPCRouter({
         throw new Error('Failed to create budget');
       }
     }),
+    autoCreate: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      
+      const urlApiBase = new URL(env.API_BASE_URL);
+      
+      try {
+        const requestCreateBudget = await fetch(`${urlApiBase.toString()}/budget/generate-current-month`, {
+          method: 'POST',
+          headers: {
+            "Content-Type": 'application/json',
+            "Authorization": `Bearer ${ctx.session.accessToken}`,
+          },
+        });
+  
+        if (!requestCreateBudget.ok) {
+          const errorText = await requestCreateBudget.text();
+          throw new Error(`Error ${requestCreateBudget.status}: ${errorText}`);
+        }
+  
+        const responseData = (await requestCreateBudget.json()) as BudgetDetail;
+        return responseData;
+      } catch (error) {
+        console.error('Fetch error:', error);
+        throw new Error('Failed to create budget');
+      }
+    }),
   
   getBudgets: protectedProcedure
     .query(async ({ ctx }) => {
-        
-      const urlApiBase = new URL('http://127.0.0.1:8000/api/v1');
-      
-      try {
+      const urlApiBase = new URL(env.API_BASE_URL);
+      try { 
         const requestGetBudgets = await fetch(`${urlApiBase.toString()}/budgets`, {
           method: 'GET',
           headers: {
@@ -74,9 +113,36 @@ export const budgetRouter = createTRPCRouter({
         return responseData;
       } catch (error) {
         console.error('Fetch error:', error);
-        throw new Error('Failed to create budget');
+        throw new Error('Failed to get budgets');
+      }
+    }),
+
+  getBudgetById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const urlApiBase = new URL(env.API_BASE_URL);
+      try { 
+        const requestGetBudget = await fetch(`${urlApiBase.toString()}/budget/${input.id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": 'application/json',
+            "Authorization": `Bearer ${ctx.session.accessToken}`,
+          },
+        });
+  
+        if (!requestGetBudget.ok) {
+          const errorText = await requestGetBudget.text();
+          throw new Error(`Error ${requestGetBudget.status}: ${errorText}`);
+        }
+  
+        const responseData = (await requestGetBudget.json()) as BudgetDetail;
+        return responseData;
+      } catch (error) {
+        console.error('Fetch error:', error);
+        throw new Error('Failed get budget');
       }
     })
+      
     
     
 });

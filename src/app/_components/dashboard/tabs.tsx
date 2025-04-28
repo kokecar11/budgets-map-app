@@ -55,10 +55,10 @@ export default function TabsDetail() {
       setTransactions(data.transactions);
     }
   }, [data]);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("transactions");
   return (
     <Tabs
-      defaultValue="overview"
+      defaultValue={activeTab}
       className="space-y-4"
       onValueChange={setActiveTab}
     >

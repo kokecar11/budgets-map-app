@@ -52,10 +52,15 @@ const formSchema = z.object({
   installment_count: z.coerce.number().min(0, {
     message: "Installment count must be at least 0.",
   }),
-  minimum_payment: z.coerce.number().min(0, {
-    message: "Minimum payment must be at least 0.",
-  }),
   status: z.string(),
+  interest_rate: z.coerce
+    .number()
+    .min(0, {
+      message: "Interest rate must be at least 0.",
+    })
+    .max(100, {
+      message: "Interest rate must be at most 100.",
+    }),
 });
 
 export function CreateDebtForm() {
@@ -76,7 +81,7 @@ export function CreateDebtForm() {
       due_date: new Date(),
       description: "",
       installment_count: 0,
-      minimum_payment: 0,
+      interest_rate: 0,
       status: "",
     },
   });
@@ -88,8 +93,9 @@ export function CreateDebtForm() {
       description: values.description,
       due_date: values.due_date,
       installment_count: values.installment_count,
-      minimum_payment: values.minimum_payment,
+
       status: "pending",
+      interest_rate: values.interest_rate,
     });
     toast({
       title: "Debt created",
@@ -150,14 +156,14 @@ export function CreateDebtForm() {
               />
               <FormField
                 control={form.control}
-                name="minimum_payment"
+                name="installment_count"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum payment</FormLabel>
+                    <FormLabel>Installment count of debt</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="Minimum payment of Debt"
+                        placeholder="Installment count"
                         {...field}
                       />
                     </FormControl>
@@ -165,66 +171,66 @@ export function CreateDebtForm() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="interest_rate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Interest rate</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Interest rate"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="due_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Due date of debt</FormLabel>
+                    <FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                            disabled={(date) => date < new Date()}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <FormField
-              control={form.control}
-              name="installment_count"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Installment count of debt</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Installment count"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="due_date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Due date of debt</FormLabel>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground",
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                          disabled={(date) => date < new Date()}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="description"

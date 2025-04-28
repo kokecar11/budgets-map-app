@@ -87,8 +87,8 @@ export function CreateDebtPaymentForm({ debt_id }: DebtPaymentProps) {
       status: "paid", // Hardcoded status
     });
     toast({
-      title: "Debt created",
-      description: "Your debt has been created successfully.",
+      title: "Payment Created",
+      description: "Your payment has been created successfully.",
       variant: "default",
     });
     form.reset();
@@ -105,9 +105,9 @@ export function CreateDebtPaymentForm({ debt_id }: DebtPaymentProps) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Debt</DialogTitle>
+          <DialogTitle>New Payment</DialogTitle>
           <DialogDescription>
-            Create a new debt to keep track of your payments.
+            Create a new payment to keep track of your debts.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -130,25 +130,24 @@ export function CreateDebtPaymentForm({ debt_id }: DebtPaymentProps) {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="installment_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Installment count of debt</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Installment count"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-
-            <FormField
-              control={form.control}
-              name="installment_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Installment count of debt</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Installment count"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="payment_date"
@@ -181,7 +180,6 @@ export function CreateDebtPaymentForm({ debt_id }: DebtPaymentProps) {
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
-                          disabled={(date) => date < new Date()}
                         />
                       </PopoverContent>
                     </Popover>

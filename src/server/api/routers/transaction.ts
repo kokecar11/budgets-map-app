@@ -28,6 +28,7 @@ export interface Summary {
     income: ValueSummary
     expense: ValueSummary
     saving: ValueSummary
+    debt: ValueSummary
 }
 
 export const transactionRouter = createTRPCRouter({

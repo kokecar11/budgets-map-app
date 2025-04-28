@@ -55,8 +55,9 @@ export const debtRouter = createTRPCRouter({
         description: z.string(), 
         due_date: z.date(), 
         installment_count: z.number(), 
-        minimum_payment: z.number(),
+        // minimum_payment: z.number(),
         status: z.string(),
+        interest_rate: z.number(),
     }))
     .mutation(async ({ input, ctx }) => {
         const urlApiBase = new URL(env.API_BASE_URL);
@@ -74,7 +75,7 @@ export const debtRouter = createTRPCRouter({
                     due_date: input.due_date,
                     status: input.status,
                     installment_count: input.installment_count,
-                    minimum_payment: input.minimum_payment,
+                    interest_rate: input.interest_rate,
                 }),
             });
             

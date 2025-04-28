@@ -4,6 +4,8 @@ import { env } from "~/env";
 interface SignInResponse {
   id: string;
   email: string;
+  fullname: string;
+  image: string;
   access_token: string;
   refresh_token: string;
   expires_in: number;
@@ -17,22 +19,23 @@ interface SignInResponse {
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
-declare module "next-auth" {
-  interface Session extends DefaultSession {
-    user: {
-      id: string;
-      // accessToken: string;
+// declare module "next-auth" {
+//   interface Session extends DefaultSession {
+//     user: {
+//       id: string;
+//       name: string;
+//       // accessToken: string;
       
-      // ...other properties
-      // role: UserRole;
-    } & DefaultSession["user"];
-  }
+//       // ...other properties
+//       // role: UserRole;
+//     } & DefaultSession["user"];
+//   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
-}
+//   // interface User {
+//   //   // ...other properties
+//   //   // role: UserRole;
+//   // }
+// }
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -74,9 +77,15 @@ export const authConfig = {
             throw new Error(`Error ${requestSignIn.status}: ${errorText}`);
           }
           const response = await requestSignIn.json() as SignInResponse;
+          if (!response) {
+            throw new Error('Invalid credentials');
+          }
+          console.log('response: ', response);
           const user = {
             id: response.id,
             email: response.email,
+            name: response.fullname,
+            image: response.image,
             accessToken: response.access_token,
             refreshToken: response.refresh_token,
             expiresIn: response.expires_in,
@@ -96,10 +105,14 @@ export const authConfig = {
     jwt: async ({ token, user }) => {
       const urlApiBase = new URL(env.API_BASE_URL);
 
+      console.log('user: ', user);
       if (user) {
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
         token.expiresIn = Date.now() + user.expiresIn * 1000;
+        token.sub = user.id;
+        token.name = user.name;
+        token.image = user.image;
       }
 
       if (Date.now() >  (token?.expiresIn as number)) {
@@ -129,13 +142,15 @@ export const authConfig = {
             token.accessToken = data.access_token;
             token.refreshToken = data.refresh_token;
             token.sub = data.id;
+            token.name = data.fullname;
+            token.image = data.image;
           }
         } catch (error) {
           console.error('Fetch error:', error);
           token.error = "RefreshTokenExpired";
         }
       }
-
+      console.log('token: ', token);
       return token;
     },
     session: ({ session, token }) => ({
@@ -146,6 +161,7 @@ export const authConfig = {
         user: {
           ...session.user,
           id: token.sub,
+          name: token.name,
         },
       }),
   },

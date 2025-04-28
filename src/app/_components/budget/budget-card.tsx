@@ -26,7 +26,7 @@ export default function BudgetCard() {
     }
   }, [data]);
 
-  const budget = budgets.find((b) => b.type === selectedType) || {
+  const budget = budgets.find((b) => b.type === selectedType) ?? {
     total_income: 0,
     total_spent: 0,
     total_remaining: 0,

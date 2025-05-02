@@ -79,7 +79,7 @@ export function UpdatePasswordForm() {
         refreshToken: refreshToken,
       });
     }
-  }, [setTokens, accessToken, refreshToken]);
+  }, [setTokens, accessToken, refreshToken, params]);
   const { mutate } = api.auth.updatePassword.useMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries();

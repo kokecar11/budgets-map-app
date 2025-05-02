@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { env } from "~/env";
 
 interface SignInResponse {
   access_token: string;
@@ -13,8 +14,7 @@ export const authRouter = createTRPCRouter({
   signIn: publicProcedure
     .input(z.object({ email: z.string().email(), password: z.string().min(8) }))
     .mutation(async ({ input }) => {
-      
-      const urlApiBase = new URL('http://127.0.0.1:8000/api/v1');
+      const urlApiBase = new URL(env.API_BASE_URL);
       
       try {
         const requestSignIn = await fetch(`${urlApiBase.toString()}/sign-in`, {
@@ -49,7 +49,7 @@ export const authRouter = createTRPCRouter({
   resetPassword: publicProcedure
   .input(z.object({ email: z.string().email() }))
   .mutation(async ({ input }) => {
-    const urlApiBase = new URL('http://127.0.0.1:8000/api/v1');
+    const urlApiBase = new URL(env.API_BASE_URL);
     try {
       const requestResetPassword = await fetch(`${urlApiBase.toString()}/reset-password`, {
         method: 'POST',
@@ -78,12 +78,11 @@ export const authRouter = createTRPCRouter({
 
   updatePassword: publicProcedure
   .input(z.object({ password: z.string().min(8) }))
-  .mutation(async ({ ctx,input }) => {
-    const urlApiBase = new URL('http://127.0.0.1:8000/api/v1');
+  .mutation(async ({ ctx, input }) => {
+    const urlApiBase = new URL(env.API_BASE_URL);
     const cookieStore = await cookies()
     const accessToken = cookieStore.get('access_token')
-    console.log(accessToken?.value)
-  
+
     try {
       const requestUpdatePassword = await fetch(`${urlApiBase.toString()}/update-password`, {
         method: 'POST',
@@ -97,7 +96,6 @@ export const authRouter = createTRPCRouter({
       });
 
       if (!requestUpdatePassword.ok) {
-        console.log('Error:', requestUpdatePassword.status);
         const errorText = await requestUpdatePassword.text();
         throw new Error(`Error ${requestUpdatePassword.status}: ${errorText}`);
       }

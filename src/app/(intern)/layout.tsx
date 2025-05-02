@@ -1,6 +1,5 @@
 "use client";
 import "~/styles/globals.css";
-import { type Metadata } from "next";
 import {
   SidebarInset,
   SidebarProvider,
@@ -17,12 +16,6 @@ import {
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
-
-// export const metadata: Metadata = {
-//   title: "Budgets Map",
-//   description: "Budgets Map is a personal finance app.",
-//   icons: [{ rel: "icon", url: "/favicon.ico" }],
-// };
 
 export default function InternLayout({
   children,

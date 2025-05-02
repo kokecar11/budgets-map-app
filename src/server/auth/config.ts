@@ -101,6 +101,7 @@ export const authConfig = {
       },
     }),
   ],
+  secret: env.AUTH_SECRET,
   callbacks: {
     jwt: async ({ token, user }) => {
       const urlApiBase = new URL(env.API_BASE_URL);

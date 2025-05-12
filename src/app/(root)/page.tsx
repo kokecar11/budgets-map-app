@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-// import SubscriptionForm from "../_components/subscription-form";
 
 export const metadata: Metadata = {
   title: "Budgets Map",

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { type Budget } from "~/server/api/routers/budget";
 import {
   Card,
@@ -11,35 +12,62 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
-import { Button } from "~/components/ui/button";
-import { AlertCircle, DollarSign, PieChart, TrendingUp } from "lucide-react";
+import { AlertCircle, DollarSign, SparkleIcon } from "lucide-react";
 import { formatCurrency } from "~/lib/utils";
 import { AnimatedCounter } from "~/components/ui/animated-counter";
+import { GenerateRecommendationAiButton } from "./generate-recommendation-button";
+
 type BudgetType = "Saving" | "Balanced" | "Debt";
+
 export default function BudgetCard() {
+  const queryClient = useQueryClient();
   const [selectedType, setSelectedType] = useState<BudgetType>("Balanced");
   const [budgets, setBudgets] = useState<Budget[]>([]);
-  const { data } = api.budget.getBudgets.useQuery();
-  useEffect(() => {
-    if (data) {
-      setBudgets(data.budgets);
-    }
-  }, [data]);
-
-  const budget = budgets.find((b) => b.type === selectedType) ?? {
+  const [budget, setBudget] = useState<Budget>({
     total_income: 0,
     total_spent: 0,
     total_remaining: 0,
     percent_spent: 0,
     description: "",
+    recommendation: "",
     name: "",
-    categories: [],
+    created_at: "",
+    updated_at: "",
+    type: "Balanced",
+    id: "",
+  });
+  const { data } = api.budget.getBudgets.useQuery();
+
+  useEffect(() => {
+    if (data) {
+      setBudgets(data.budgets);
+      if (selectedType) {
+        const selectedBudget = data.budgets.find(
+          (b) => b.type === selectedType,
+        )!;
+        setBudget(selectedBudget);
+      }
+    }
+  }, [data, selectedType]);
+
+  const { mutate } = api.budget.update.useMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
+    },
+  });
+
+  const onRecommendationGenerated = (recommendation: string) => {
+    mutate({
+      id: budget.id,
+      recommendation: recommendation,
+    });
+
+    setBudget((prevBudget) => ({
+      ...prevBudget,
+      recommendation: recommendation,
+    }));
   };
 
-  // Calculate percentage spent
-  // const percentageSpent = Math.round((budget. / budget.total) * 100);
-
-  // Determine status color based on percentage spent
   const getStatusColor = () => {
     if (budget.total_remaining < 0) return "text-red-500";
     if (budget.percent_spent >= 90) return "text-red-500";
@@ -66,9 +94,9 @@ export default function BudgetCard() {
                   : "hover:bg-muted-foreground/10"
               }`}
             >
-              {type === "Saving" && "Ahorrador"}
-              {type === "Balanced" && "Balanceado"}
-              {type === "Debt" && "En Deuda"}
+              {type === "Saving" && "Saving"}
+              {type === "Balanced" && "Balanced"}
+              {type === "Debt" && "Debt"}
             </button>
           ))}
         </div>
@@ -78,7 +106,7 @@ export default function BudgetCard() {
         <div>
           <div className="mb-6 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Total Gastado</span>
+              <span className="text-sm font-medium">Total Spent</span>
               <span className="font-bold">
                 <AnimatedCounter value={budget.total_spent} duration={2000} />
               </span>
@@ -97,15 +125,13 @@ export default function BudgetCard() {
           {/* Budget Summary */}
           <div className="mb-6 grid grid-cols-1 gap-4">
             <div className="rounded-lg bg-primary/10 p-3">
-              <div className="text-xs text-muted-foreground">
-                Presupuesto Total
-              </div>
+              <div className="text-xs text-muted-foreground">Total Budget</div>
               <div className="text-lg font-bold">
                 {formatCurrency(budget.total_income)}
               </div>
             </div>
             <div className="rounded-lg bg-primary/10 p-3">
-              <div className="text-xs text-muted-foreground">Restante</div>
+              <div className="text-xs text-muted-foreground">Remainder</div>
               <div
                 className={`text-lg font-bold ${getStatusColor()} flex items-center gap-1`}
               >
@@ -138,26 +164,30 @@ export default function BudgetCard() {
 
         {/* Recomendaciones basadas en el tipo de presupuesto */}
         <div className="mt-4 rounded-lg bg-muted/50 p-3">
-          <h3 className="mb-2 text-sm font-medium">Recomendación</h3>
+          <h3 className="mb-2 flex items-center text-sm font-medium">
+            <SparkleIcon className="mr-2 h-4 w-4"></SparkleIcon>
+            Recommendation
+          </h3>
           <p className="text-xs text-muted-foreground">
-            {selectedType === "Saving" &&
-              "Excelente trabajo ahorrando. Considera invertir parte de tus ahorros para obtener mejores rendimientos."}
-            {selectedType === "Balanced" &&
-              "Tu presupuesto está bien equilibrado. Intenta aumentar tu ahorro en un 5% el próximo mes."}
-            {selectedType === "Debt" &&
-              "Prioriza el pago de deudas. Considera reducir gastos en entretenimiento temporalmente."}
+            {budget.recommendation}
           </p>
+          <div className="mt-2">
+            <GenerateRecommendationAiButton
+              onRecommendationGenerated={onRecommendationGenerated}
+              type_budget={selectedType}
+            />
+          </div>
         </div>
       </CardContent>
-      <CardFooter className="mt-auto flex justify-between pt-4">
-        <Button variant="outline" size="sm" className="flex items-center gap-1">
+      <CardFooter className="mx-auto mt-auto pt-4">
+        {/* <Button variant="outline" size="sm" className="flex items-center gap-1">
           <PieChart className="h-4 w-4" />
           <span>Análisis</span>
-        </Button>
-        <Button size="sm" className="flex items-center gap-1">
+        </Button> */}
+        {/* <Button size="sm" className="flex items-center gap-1">
           <TrendingUp className="h-4 w-4" />
-          <span>Ajustar</span>
-        </Button>
+          <span>Adjust</span>
+        </Button> */}
       </CardFooter>
     </Card>
   );

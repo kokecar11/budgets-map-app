@@ -24,6 +24,7 @@ export interface Budget {
     id: string
     name: string
     description: string
+    recommendation: string
     type: string
     total_income: number
     total_spent: number
@@ -89,6 +90,42 @@ export const budgetRouter = createTRPCRouter({
       } catch (error) {
         console.error('Fetch error:', error);
         throw new Error('Failed to create budget');
+      }
+    }),
+
+  update: protectedProcedure
+    .input(z.object({ id: z.string(), name: z.string().optional(), recommendation: z.string().optional(), description: z.string().optional()}))
+    .mutation(async ({ input, ctx }) => {
+      const urlApiBase = new URL(env.API_BASE_URL);
+
+      const { id, ...inputData } = input;
+    
+      
+      const body = Object.fromEntries(
+        Object.entries(inputData).filter(([_, value]) => value !== undefined)
+      );
+
+      try {
+        const requestUpdateBudget = await fetch(`${urlApiBase.toString()}/budget/${id}`, {
+          method: 'PUT',
+          headers: {
+            "Content-Type": 'application/json',
+            "Authorization": `Bearer ${ctx.session.accessToken}`,
+          },
+          body: JSON.stringify(body),
+        });
+  
+        if (!requestUpdateBudget.ok) {
+          const errorText = await requestUpdateBudget.text();
+          throw new Error(`Error ${requestUpdateBudget.status}: ${errorText}`);
+        }
+  
+        const responseData = (await requestUpdateBudget.json()) as BudgetDetail;
+        return responseData;
+      }
+      catch (error) {
+        console.error('Fetch error:', error);
+        throw new Error('Failed to update budget');
       }
     }),
   

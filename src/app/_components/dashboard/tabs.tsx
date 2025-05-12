@@ -65,17 +65,17 @@ export default function TabsDetail() {
       <TabsList>
         {/* <TabsTrigger value="overview">Resumen</TabsTrigger> */}
         {/* <TabsTrigger value="analytics">Análisis</TabsTrigger> */}
-        <TabsTrigger value="transactions">Transacciones</TabsTrigger>
+        <TabsTrigger value="transactions">Transactions</TabsTrigger>
         {/* <TabsTrigger value="categories">Categorías</TabsTrigger> */}
-        <TabsTrigger value="debts">Deudas</TabsTrigger>
+        <TabsTrigger value="debts">Debts</TabsTrigger>
       </TabsList>
       <TabsContent value="overview" className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="lg:col-span-4">
             <CardHeader>
-              <CardTitle>Ingresos vs Gastos</CardTitle>
+              <CardTitle>Income vs Expenses</CardTitle>
               <CardDescription>
-                Comparativa de los últimos 6 meses
+                Comparison of monthly income and expenses
               </CardDescription>
             </CardHeader>
             <CardContent className="pl-2">
@@ -141,8 +141,8 @@ export default function TabsDetail() {
         <Card>
           <CardHeader className="flex flex-row items-center">
             <div>
-              <CardTitle>Transacciones Recientes</CardTitle>
-              <CardDescription>Historial de movimientos</CardDescription>
+              <CardTitle>Recent Transactions</CardTitle>
+              <CardDescription>Transaction History</CardDescription>
             </div>
             <div className="ml-auto">
               <CreateTransactionForm />
@@ -156,7 +156,9 @@ export default function TabsDetail() {
                   className="flex items-center justify-between border-b pb-4"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="rounded-full bg-muted p-2">
+                    <div
+                      className={`rounded-full p-2 ${transaction.type === "Income" ? "bg-green-500" : "bg-red-500"}`}
+                    >
                       {/* <transaction.icon className="h-4 w-4" /> */}
                     </div>
                     <div>
@@ -190,7 +192,7 @@ export default function TabsDetail() {
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full">
-              Ver todas las transacciones
+              View all transactions
             </Button>
           </CardFooter>
         </Card>

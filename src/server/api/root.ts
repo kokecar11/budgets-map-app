@@ -5,6 +5,7 @@ import { incomeRouter } from "~/server/api/routers/income";
 import { transactionRouter } from "~/server/api/routers/transaction";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { debtRouter } from "./routers/debt";
+import { AiRouter } from "./routers/ai";
 
 /**
  * This is the primary router for your server.
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   income: incomeRouter,
   transaction: transactionRouter,
   debt: debtRouter,
+  ai: AiRouter
 });
 
 // export type definition of API

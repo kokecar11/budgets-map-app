@@ -10,6 +10,7 @@ import {
   DollarSignIcon,
 } from "lucide-react";
 import { AnimatedCounter } from "~/components/ui/animated-counter";
+import { Income } from "../../../server/api/routers/income";
 
 export default function SummaryCard() {
   const [income, setIncome] = useState<ValueSummary>({
@@ -40,9 +41,7 @@ export default function SummaryCard() {
     <div className="grid gap-4 md:grid-cols-3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Ingresos Mensuales
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Monthly Income</CardTitle>
           <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -66,16 +65,16 @@ export default function SummaryCard() {
               ) : (
                 <ArrowRightLeftIcon className="mr-1 h-4 w-4 text-black" />
               )}
-              {(income?.growth).toFixed(2)}%
+              {income?.growth}%
             </span>{" "}
-            vs mes anterior
+            vs previous month
           </p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Gastos Mensuales
+            Monthly Expenses
           </CardTitle>
           <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -102,15 +101,13 @@ export default function SummaryCard() {
               )}
               {expense?.growth}%
             </span>{" "}
-            vs mes anterior
+            vs previous month
           </p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Deudas Mensuales
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Monthly Debts</CardTitle>
           <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -120,9 +117,9 @@ export default function SummaryCard() {
           <p className="text-xs text-muted-foreground">
             <span
               className={`flex items-center ${
-                expense?.growth > 0
+                debt?.growth > 0
                   ? "text-green-500"
-                  : expense?.growth < 0
+                  : debt?.growth < 0
                     ? "text-red-500"
                     : "text-black"
               }`}
@@ -136,7 +133,7 @@ export default function SummaryCard() {
               )}
               {debt?.growth}%
             </span>{" "}
-            vs mes anterior
+            vs previous month
           </p>
         </CardContent>
       </Card>

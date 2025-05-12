@@ -84,9 +84,9 @@ export function DebtTracker() {
     <Card>
       <CardHeader className="flex flex-row items-center">
         <div>
-          <CardTitle>Seguimiento de deudas</CardTitle>
+          <CardTitle>Debt follow-up</CardTitle>
           <CardDescription>
-            Mantén un control de tus deudas y pagos pendientes
+            Keep track of your debts and outstanding payments
           </CardDescription>
         </div>
         <div className="ml-auto">
@@ -109,11 +109,11 @@ export function DebtTracker() {
                     }
                     className="ml-2"
                   >
-                    {debt.interest_rate}% interés
+                    {debt.interest_rate}% interest
                   </Badge>
                 </div>
                 <CardDescription>
-                  Cuota mensual:{" "}
+                  Monthly Fee:{" "}
                   <AnimatedCounter
                     value={debt.minimum_payment}
                     duration={1000}
@@ -123,17 +123,17 @@ export function DebtTracker() {
               <CardContent className="pb-2">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Progreso de pago</span>
+                    <span>Payment progress</span>
                     <span className="font-medium">
                       {debt.paid_installments} de {debt.installment_count}{" "}
-                      cuotas
+                      installments
                     </span>
                   </div>
                   <Progress value={calculateProgress(debt)} className="h-2" />
 
                   <div className="mt-1 flex justify-between text-xs text-muted-foreground">
                     <span>
-                      Pagado:{" "}
+                      Paid:{" "}
                       <AnimatedCounter
                         value={debt.total_paid}
                         duration={1000}
@@ -149,7 +149,7 @@ export function DebtTracker() {
                     <div className="flex items-center text-sm text-muted-foreground">
                       <CalendarClock className="mr-1 h-4 w-4" />
                       <span>
-                        Próximo pago:{" "}
+                        Next payment:{" "}
                         {formatDate(
                           debt.next_payment_date || new Date().toISOString(),
                         )}
@@ -162,8 +162,8 @@ export function DebtTracker() {
                       className="text-xs"
                     >
                       {expandedDebt === debt.id
-                        ? "Menos detalles"
-                        : "Más detalles"}
+                        ? "Less details"
+                        : "More details"}
                     </Button>
                   </div>
                 </div>
@@ -173,7 +173,7 @@ export function DebtTracker() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="rounded-lg bg-muted/50 p-3">
                         <div className="text-xs text-muted-foreground">
-                          Restante
+                          Remainder
                         </div>
                         <div className="text-lg font-bold">
                           <AnimatedCounter
@@ -184,7 +184,7 @@ export function DebtTracker() {
                       </div>
                       <div className="rounded-lg bg-muted/50 p-3">
                         <div className="text-xs text-muted-foreground">
-                          Cuotas restantes
+                          Remaining installments
                         </div>
                         <div className="text-lg font-bold">
                           {calculateRemainingMonths(debt)}
@@ -196,7 +196,7 @@ export function DebtTracker() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-xs text-muted-foreground">
-                            Total en intereses
+                            Total in interests
                           </div>
                           <div className="text-lg font-bold text-amber-600">
                             <AnimatedCounter
@@ -211,7 +211,7 @@ export function DebtTracker() {
 
                     <div className="text-xs text-muted-foreground">
                       <p>
-                        Finalización estimada:{" "}
+                        Estimated completion:{" "}
                         {new Date(
                           debt.estimated_completion_date,
                         ).toLocaleDateString("es-ES", {

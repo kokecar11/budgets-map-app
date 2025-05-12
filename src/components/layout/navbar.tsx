@@ -88,7 +88,7 @@ export function Navbar() {
           {/* Autenticación */}
           {status === "loading" ? (
             <div className="h-9 w-9 animate-pulse rounded-full bg-muted"></div>
-          ) : session ? (
+          ) : session && session?.error !== "RefreshTokenExpired" ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">

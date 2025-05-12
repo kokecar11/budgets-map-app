@@ -35,7 +35,6 @@ export const transactionRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ category: z.string(), amount: z.number(), description: z.string(), type: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      console.log('input:', input);
       const urlApiBase = new URL(env.API_BASE_URL);
       
       try {

@@ -34,7 +34,6 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
-  console.log(session);
   const user = {
     name: session?.user.name ?? "",
     email: session?.user.email,

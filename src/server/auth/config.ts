@@ -80,7 +80,6 @@ export const authConfig = {
           if (!response) {
             throw new Error('Invalid credentials');
           }
-          console.log('response: ', response);
           const user = {
             id: response.id,
             email: response.email,
@@ -105,8 +104,6 @@ export const authConfig = {
   callbacks: {
     jwt: async ({ token, user }) => {
       const urlApiBase = new URL(env.API_BASE_URL);
-
-      console.log('user: ', user);
       if (user) {
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
@@ -149,9 +146,9 @@ export const authConfig = {
         } catch (error) {
           console.error('Fetch error:', error);
           token.error = "RefreshTokenExpired";
+          return null
         }
       }
-      console.log('token: ', token);
       return token;
     },
     session: ({ session, token }) => ({

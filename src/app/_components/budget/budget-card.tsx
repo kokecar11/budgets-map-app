@@ -30,7 +30,7 @@ export default function BudgetCard() {
     percent_spent: 0,
     description: "",
     recommendation: "",
-    name: "",
+    name: "Budget",
     created_at: "",
     updated_at: "",
     type: "Balanced",
@@ -58,7 +58,7 @@ export default function BudgetCard() {
 
   const onRecommendationGenerated = (recommendation: string) => {
     mutate({
-      id: budget.id,
+      id: budget?.id,
       recommendation: recommendation,
     });
 
@@ -69,9 +69,9 @@ export default function BudgetCard() {
   };
 
   const getStatusColor = () => {
-    if (budget.total_remaining < 0) return "text-red-500";
-    if (budget.percent_spent >= 90) return "text-red-500";
-    if (budget.percent_spent >= 75) return "text-yellow-500";
+    if (budget?.total_remaining < 0) return "text-red-500";
+    if (budget?.percent_spent >= 90) return "text-red-500";
+    if (budget?.percent_spent >= 75) return "text-yellow-500";
     return "text-green-500";
   };
 
@@ -79,10 +79,10 @@ export default function BudgetCard() {
     <Card className="flex h-full flex-col">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center justify-between">
-          <span>{budget.name}</span>
+          <span>{budget?.name}</span>
           <DollarSign className="h-5 w-5 text-primary" />
         </CardTitle>
-        <CardDescription>{budget.description}</CardDescription>
+        <CardDescription>{budget?.description}</CardDescription>
         <div className="mt-4 flex gap-2 rounded-lg bg-muted p-1">
           {budgets.map(({ type }) => (
             <button
@@ -108,12 +108,12 @@ export default function BudgetCard() {
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Total Spent</span>
               <span className="font-bold">
-                <AnimatedCounter value={budget.total_spent} duration={2000} />
+                <AnimatedCounter value={budget?.total_spent} duration={2000} />
               </span>
             </div>
             <Progress
-              value={budget.percent_spent > 100 ? 100 : budget.percent_spent}
-              className={`h-2 ${budget.percent_spent > 100 ? "bg-red-200" : ""}`}
+              value={budget?.percent_spent > 100 ? 100 : budget?.percent_spent}
+              className={`h-2 ${budget?.percent_spent > 100 ? "bg-red-200" : ""}`}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>0%</span>
@@ -127,7 +127,7 @@ export default function BudgetCard() {
             <div className="rounded-lg bg-primary/10 p-3">
               <div className="text-xs text-muted-foreground">Total Budget</div>
               <div className="text-lg font-bold">
-                {formatCurrency(budget.total_income)}
+                {formatCurrency(budget?.total_income)}
               </div>
             </div>
             <div className="rounded-lg bg-primary/10 p-3">
@@ -135,8 +135,8 @@ export default function BudgetCard() {
               <div
                 className={`text-lg font-bold ${getStatusColor()} flex items-center gap-1`}
               >
-                {formatCurrency(budget.total_remaining)}
-                {budget.total_remaining < 0 && (
+                {formatCurrency(budget?.total_remaining)}
+                {budget?.total_remaining < 0 && (
                   <AlertCircle className="h-4 w-4" />
                 )}
               </div>
@@ -169,13 +169,15 @@ export default function BudgetCard() {
             Recommendation
           </h3>
           <p className="text-xs text-muted-foreground">
-            {budget.recommendation}
+            {budget?.recommendation}
           </p>
           <div className="mt-2">
-            <GenerateRecommendationAiButton
-              onRecommendationGenerated={onRecommendationGenerated}
-              type_budget={selectedType}
-            />
+            {budget?.id && (
+              <GenerateRecommendationAiButton
+                onRecommendationGenerated={onRecommendationGenerated}
+                type_budget={selectedType}
+              />
+            )}
           </div>
         </div>
       </CardContent>
